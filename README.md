@@ -1,29 +1,103 @@
-# linked-list
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node {
+
+typedef struct Node {
     int data;
     struct Node* next;
-};
+} Node;
 
-int main() {
-    int value;
-    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
-    
-    if (node == NULL) {
-        printf("Memory allocation failed\n");
-        return 1;
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void printList(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
     }
+    printf("NULL\n");
+}
+
+void insertMiddle(Node** head, int data) {
+    if (*head == NULL) {
+        // If list is empty, just add the node
+        *head = createNode(data);
+        return;
+    }
+
+    Node* slow = *head;
+    Node* fast = *head;
+    Node* prev = NULL;
+
     
-    printf("Enter a value for the node: ");
-    scanf("%d", &value);
+    while (fast != NULL && fast->next != NULL) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
     
-    node->data = value;
-    node->next = NULL;
+    Node* newNode = createNode(data);
+    if (prev != NULL) {
+        prev->next = newNode;
+    }
+    newNode->next = slow;
+}
+
+void deleteMiddle(Node** head) {
+    if (*head == NULL) return; // Empty list
+    if ((*head)->next == NULL) { // Only one node
+        free(*head);
+        *head = NULL;
+        return;
+    }
+
+    Node* slow = *head;
+    Node* fast = *head;
+    Node* prev = NULL;
+
     
-    printf("Node data: %d\n", node->data);
+    while (fast != NULL && fast->next != NULL) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
     
-    free(node);
+    if (prev != NULL) {
+        prev->next = slow->next;
+    }
+    free(slow);
+}
+int main() {
+    Node* head = NULL;
+
+   
+    insertMiddle(&head, 1);
+    insertMiddle(&head, 2);
+    insertMiddle(&head, 3);
+    insertMiddle(&head, 4);
+    insertMiddle(&head, 5);
+
+    printf("Original List:\n");
+    printList(head);
+
+    
+    insertMiddle(&head, 99);
+    printf("After Inserting 99 in the middle:\n");
+    printList(head);
+
+   
+    deleteMiddle(&head);
+    printf("After Deleting the middle node:\n");
+    printList(head);
+
     return 0;
 }
+
+
